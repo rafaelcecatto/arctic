@@ -15,8 +15,20 @@
   
 <div class="row">
 
-    <div class="col-lg-3">
+    
+    <?php if($grupo->id < 3):  ?>
+        <div class="col-lg-12">
+            <div class="alert alert-info" role="alert">
+                 O grupo <b><?php echo esc($grupo->nome)?></b> não pode ser excluído!
+            </div>
+        </div>    
+    <?php endif; ?>
+    
+    
 
+    <div class="col-md-12">
+
+    
         <div class="user-block block">
 
             
@@ -26,7 +38,7 @@
             <p class="contributions mt-0"><?php echo $grupo->exibeSituacao(); ?>
         
             <?php if($grupo->data_exclusao == null): ?>
-                <a tabindex="0" style="text-decoration: none;" role="button" data-toggle="popover" data-trigger="focus" title="Importante" data-content="Esse Grupo <?php echo($grupo->exibir == true ? 'será' : 'não será'); ?> exibido como opção na hora de definir um <b>Responsável Técnico Pela Ordem de Serviço!</b>">&nbsp;<i class="fa fa-question-circle fa-lg text-danger"></i></a>
+                <a tabindex="0" style="text-decoration: none;" role="button" data-toggle="popover" data-trigger="focus" title="<b class='text-danger'>Importante</b>" data-content="Esse Grupo <?php echo($grupo->exibir == true ? 'será' : 'não será'); ?> exibido como opção na hora de definir um <b>Responsável Técnico Pela Ordem de Serviço!</b>">&nbsp;<i class="fa fa-question-circle fa-lg text-danger"></i></a>
             <?php endif; ?>
             </p>
 
@@ -34,7 +46,9 @@
             <p class="card-text">Data de Alteração: <?php echo $grupo->data_alteracao->humanize(); ?></p>
 
                 <!-- Example single danger button -->
-                <div class="btn-group">
+                <?php if($grupo->id > 2):  ?>
+
+                    <div class="btn-group mr-2">
                     <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                      Ações
                     </button>
@@ -49,7 +63,9 @@
                     </div>
                 </div>
 
-                <a href="<?php echo site_url("grupos") ?>" class="btn btn-secondary btn-sm ml-2">Voltar</a>
+                <?php endif; ?>
+
+                <a href="<?php echo site_url("grupos") ?>" class="btn btn-secondary btn-sm">Voltar</a>
         </div>
     </div>
 
