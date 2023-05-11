@@ -1,0 +1,63 @@
+<?php echo $this->extend('Layout/principal') ?>
+
+
+<?php echo $this->section('titulo') ?>
+  <?php echo $titulo; ?>
+<?php echo $this->endSection() ?>
+
+
+<?php echo $this->section('estilos') ?>
+  
+<?php echo $this->endSection() ?>
+
+
+<?php echo $this->section('conteudo') ?>
+  
+<div class="row">
+
+    <div class="col-lg-3">
+
+        <div class="user-block block">
+
+            
+            <h5 class="card-title mt-2"><?php echo esc($grupo->nome); ?></h5>
+            <p class="card-text"><?php echo esc($grupo->descricao); ?></p>
+
+            <p class="contributions mt-0"><?php echo $grupo->exibeSituacao(); ?>
+        
+            <?php if($grupo->data_exclusao == null): ?>
+                <a tabindex="0" style="text-decoration: none;" role="button" data-toggle="popover" data-trigger="focus" title="Importante" data-content="Esse Grupo <?php echo($grupo->exibir == true ? 'será' : 'não será'); ?> exibido como opção na hora de definir um <b>Responsável Técnico Pela Ordem de Serviço!</b>">&nbsp;<i class="fa fa-question-circle fa-lg text-danger"></i></a>
+            <?php endif; ?>
+            </p>
+
+            <p class="card-text">Data de Cadastro: <?php echo $grupo->data_cadastro->humanize(); ?></p>
+            <p class="card-text">Data de Alteração: <?php echo $grupo->data_alteracao->humanize(); ?></p>
+
+                <!-- Example single danger button -->
+                <div class="btn-group">
+                    <button type="button" class="btn btn-info btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                     Ações
+                    </button>
+                     <div class="dropdown-menu">
+                        <a class="dropdown-item" href="<?php echo site_url("grupos/editar/$grupo->id"); ?>">Editar</a>
+                    <div class="dropdown-divider"></div>
+                        <?php if($grupo->data_exclusao == null):  ?>
+                            <a class="dropdown-item" href="<?php echo site_url("grupos/excluir/$grupo->id"); ?>">Excluir</a>
+                        <?php else: ?>
+                            <a class="dropdown-item" href="<?php echo site_url("grupos/restaurargrupo/$grupo->id"); ?>">Recuperar</a>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <a href="<?php echo site_url("grupos") ?>" class="btn btn-secondary btn-sm ml-2">Voltar</a>
+        </div>
+    </div>
+
+</div>
+
+<?php echo $this->endSection() ?>
+
+
+<?php echo $this->section('scripts') ?>
+  
+<?php echo $this->endSection() ?>
