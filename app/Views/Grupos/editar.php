@@ -26,14 +26,14 @@
 
             </div>
             <!--Abre Formulário-->
-            <?php echo form_open('/', ['id' => 'form'], ['id' => "$usuario->id"]) ?>
+            <?php echo form_open('/', ['id' => 'form'], ['id' => "$grupo->id"]) ?>
 
-            <?php echo $this->include('Usuarios/_form') ?>
+            <?php echo $this->include('Grupos/_form') ?>
 
             <div class="form-group mt-5 mb-2">
 
                 <input id="btn-salvar" type="submit" value="Salvar" class="btn btn-info btn-sm mr-2">
-                <a href="<?php echo site_url("usuarios/exibir/$usuario->id") ?>" class="btn btn-secondary btn-sm ml-2">Voltar</a>
+                <a href="<?php echo site_url("grupos/exibir/$grupo->id") ?>" class="btn btn-secondary btn-sm ml-2">Voltar</a>
             </div>
 
             <!--Fecha Forma-->
@@ -64,7 +64,7 @@
             $.ajax({
 
                 type: 'POST',
-                url: '<?php echo site_url('usuarios/atualizar'); ?>',
+                url: '<?php echo site_url('grupos/atualizar'); ?>',
                 data: new FormData(this),
                 dataType: 'json',
                 contentType: false,
@@ -93,7 +93,7 @@
                         }else{
 
                             // Redirecionamento, quando não houver erro
-                            window.location.href = "<?php echo site_url("usuarios/exibir/$usuario->id"); ?>";
+                            window.location.href = "<?php echo site_url("grupos/exibir/$grupo->id"); ?>";
                         }
                     }
 

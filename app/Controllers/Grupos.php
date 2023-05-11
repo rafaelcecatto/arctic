@@ -15,6 +15,7 @@ class Grupos extends BaseController
         $this->grupoModel = new \App\Models\GrupoModel();
     }
 
+
     public function index()
     {
         $data = [
@@ -25,7 +26,7 @@ class Grupos extends BaseController
     }
 
 
-    public function recuperagrupos()
+    public function recuperaGrupos()
     {
 
         if(!$this->request->isAJAX()){
@@ -80,6 +81,26 @@ class Grupos extends BaseController
          return view('Grupos/exibir', $data);
  
      }
+
+      //Funcao Editar
+      public function editar(int $id = null)
+      {
+          //Validando o Usuário
+          $grupo = $this->buscaGrupoOu404($id);
+
+          if($grupo->id < 3){
+
+            return redirect()->back()->with('atencao', 'O Grupo <b>' .esc($grupo->nome). '</b> Não Pode ser Editado nem Excluído!');
+          }
+          
+          $data = [
+              'titulo' => "Editar o Grupo ".esc($grupo->nome),
+              'grupo' => $grupo,
+  
+          ];
+          return view('Grupos/editar', $data);
+  
+      }
 
 
       //Metodo que Busca o Grupo
