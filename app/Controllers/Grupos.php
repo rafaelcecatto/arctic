@@ -246,9 +246,9 @@ class Grupos extends BaseController
     }
 
 
-     //Funcao Restaurar Usuário
-     public function restaurarGrupo(int $id = null)
-     {
+    //Funcao Restaurar Usuário
+    public function restaurarGrupo(int $id = null)
+    {
          //Validando o Usuário
          $grupo = $this->buscaGrupoOu404($id);
  
@@ -260,7 +260,29 @@ class Grupos extends BaseController
          $this->grupoModel->protect(false)->save($grupo);
  
          return redirect()->back()->with('sucesso', 'Grupo'.esc($grupo->nome).' Recuperado com Sucesso!');
-     }
+    }
+
+
+    //Funcao Permissoes
+    public function permissoes(int $id = null)
+    {
+        //Validando o Usuário
+        $grupo = $this->buscaGrupoOu404($id);
+
+        if($grupo->id < 3){
+            return redirect()->back()->with('info', 'O Grupo <b>' .esc($grupo->nome). '</b> Não Precisa de definição de Acessos!');
+        }
+
+
+         
+         $data = [
+             'titulo' => "Gerenciar as Permissoes de Acesso do ".esc($grupo->nome),
+             'grupo' => $grupo,
+ 
+         ];
+         return view('Grupos/permissoes', $data);
+ 
+    }
 
 
     //Metodo que Busca o Grupo
