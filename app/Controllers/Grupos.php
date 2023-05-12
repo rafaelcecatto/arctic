@@ -66,10 +66,62 @@ class Grupos extends BaseController
         return $this->response->setJSON($retorno);
     }
 
+    //Funcao Criar
+    public function criar(int $id = null)
+    {
+          //Validando o Usuário
+          $grupo = new Grupo();
 
-     //Funcao Exibir
-     public function exibir(int $id = null)
-     {
+          $data = [
+              'titulo' => "Cadastrar o Grupo",
+              'grupo' => $grupo,
+  
+          ];
+          return view('Grupos/criar', $data);
+  
+    }
+
+
+    //Funcao Cadastrar
+    public function cadastrar()
+    {
+
+        if (!$this->request->isAJAX()){ 
+            return redirect()->back();
+        }
+
+        // Envio hash  Token do Form
+        $retorno['token'] = csrf_hash();
+
+        // Recupero o Post da requisição
+        $post = $this->request->getPost();
+
+  
+        // Cria novo Objeto da entidade Usuario
+        $grupo = new Grupo($post);
+
+
+        if($this->grupoModel->save($grupo)){
+
+            session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+
+            $retorno['id'] = $this->grupoModel->getInsertID();
+            return $this->response->setJSON($retorno);
+
+        }
+
+        // Retorno de erro de Validação
+        $retorno['erro'] = 'Verifique os Dados';
+        $retorno['erros_model'] = $this->grupoModel->errors();
+
+        //Retorno para o Ajax Request
+        return $this->response->setJSON($retorno);
+    }
+
+
+    //Funcao Exibir
+    public function exibir(int $id = null)
+    {
          //Validando o Usuário
          $grupo = $this->buscaGrupoOu404($id);
          
@@ -80,11 +132,12 @@ class Grupos extends BaseController
          ];
          return view('Grupos/exibir', $data);
  
-     }
+    }
 
-      //Funcao Editar
-      public function editar(int $id = null)
-      {
+     
+    //Funcao Editar
+    public function editar(int $id = null)
+    {
           //Validando o Usuário
           $grupo = $this->buscaGrupoOu404($id);
 
@@ -100,10 +153,117 @@ class Grupos extends BaseController
           ];
           return view('Grupos/editar', $data);
   
-      }
+    }
 
 
-      //Metodo que Busca o Grupo
+    //Funcao Atualizar
+    public function atualizar()
+    {
+
+        if (!$this->request->isAJAX()){ 
+            return redirect()->back();
+        }
+
+        // Envio hash  Token do Form
+        $retorno['token'] = csrf_hash();
+
+        // Recupero o Post da requisição
+        $post = $this->request->getPost();
+
+  
+        //Validando o Usuário
+        $grupo = $this->buscaGrupoOu404($post['id']);
+
+            
+            //Evita Manipulação de Formulário
+            if($grupo->id < 3){
+
+            $retorno['erro'] = 'Verifique os Dados';
+            $retorno['erros_model'] = ['O Grupo <b class="text-white">' .esc($grupo->nome). '</b> Não Pode ser Editado nem Excluído!'];
+            return $this->response->setJSON($retorno);
+          }
+
+       
+        //Preenchemos os Atributos dos Usuários com os Valores do POST
+        $grupo->fill($post);
+
+        if($grupo->hasChanged() == false){
+            $retorno['info'] = 'Não a Dados para Serem Atualizados';
+            return $this->response->setJSON($retorno);
+        }
+
+
+        if($this->grupoModel->protect(false)->save($grupo)){
+
+            session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+
+            return $this->response->setJSON($retorno);
+
+        }
+
+        // Retorno de erro de Validação
+        $retorno['erro'] = 'Verifique os Dados';
+        $retorno['erros_model'] = $this->grupoModel->errors();
+
+        //Retorno para o Ajax Request
+        return $this->response->setJSON($retorno);
+    }
+
+
+    //Funcao Excluir
+    public function excluir(int $id = null)
+    {
+        //Validando o Usuário
+        $grupo = $this->buscaGrupoOu404($id);
+
+        if($grupo->id < 3){
+
+            return redirect()->back()->with('atencao', 'O Grupo <b>' .esc($grupo->nome). '</b> Não Pode ser Editado nem Excluído!');
+          }
+
+        if($grupo->data_exclusao != null){
+
+            return redirect()->back()->with('info', "Esse Grupo já foi Excluído!");
+
+        }
+
+        if($this->request->getMethod() === 'post'){
+            //Excluie o Grupo
+            $this->grupoModel->delete($grupo->id);
+            
+
+            return redirect()->to(site_url("grupos"))->with('sucesso', 'Grupo'.esc($grupo->nome).' excluído com Sucesso!');
+
+        }
+        
+        $data = [
+            'titulo' => "Excluir Grupo ".esc($grupo->nome),
+            'grupo' => $grupo,
+
+        ];
+        return view('Grupos/excluir', $data);
+
+    }
+
+
+     //Funcao Restaurar Usuário
+     public function restaurarGrupo(int $id = null)
+     {
+         //Validando o Usuário
+         $grupo = $this->buscaGrupoOu404($id);
+ 
+         if($grupo->data_exclusao == null){
+             return redirect()->back()->with('info', "Grupo não está Excluído!");
+         }
+
+         $grupo->data_exclusao = null;
+         $this->grupoModel->protect(false)->save($grupo);
+ 
+         return redirect()->back()->with('sucesso', 'Grupo'.esc($grupo->nome).' Recuperado com Sucesso!');
+     }
+
+
+    //Metodo que Busca o Grupo
     private function buscaGrupoOu404(int $id = null)
     {
 
@@ -113,4 +273,6 @@ class Grupos extends BaseController
 
         return $grupo;
     }
+
+    
 }
