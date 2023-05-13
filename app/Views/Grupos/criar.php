@@ -86,7 +86,7 @@
                     if(!response.erro){
 
                        // Redirecionamento, quando não houver erro
-                       window.location.href = "<?php echo site_url("grupos/exibir/"); ?>" + response.id;
+                       window.location.href = "<?php echo site_url("grupos/index/"); ?>" + response.id;
                     }
 
                     if(response.erro){

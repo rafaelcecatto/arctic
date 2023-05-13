@@ -22,7 +22,7 @@ class GrupoPermissaoModel extends Model
     public function recuperaPermissoesDoGrupo(int $grupo_id, int $quantidade_paginacao){
 
         $atributos = [
-            'grupos_permissoes.id',
+            'grupos_permissoes.id AS principal_id',
             'grupos.id AS grupo_id',
             'permissoes.id permissao_id',
             'permissoes.nome',
