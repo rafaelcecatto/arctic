@@ -10,10 +10,14 @@ class Usuarios extends BaseController
 {
 
     private $usuarioModel;
+    private $grupoUsuarioModel;
+    private $grupoModel;
 
     public function __construct() 
     {
         $this->usuarioModel = new \App\Models\UsuarioModel();
+        $this->grupoUsuarioModel = new \App\Models\GrupoUsuarioModel();
+        $this->grupoModel = new \App\Models\GrupoModel();
     }
 
     
@@ -394,6 +398,105 @@ class Usuarios extends BaseController
  
          return redirect()->back()->with('sucesso', "Usuário $usuario->nome Recuperado com Sucesso!");
      }
+
+
+     //Funcao Grupos e Usuarios
+    public function grupos(int $id = null)
+    {
+        //Validando o Usuário
+        $usuario = $this->buscaUsuarioOu404($id);
+
+        $usuario->grupos = $this->grupoUsuarioModel->recuperaGruposDoUsuario($usuario->id, 5);
+        $usuario->pager = $this->grupoUsuarioModel->pager;
+
+        
+        $data = [
+            'titulo' => "Gerenciamento de Grupos de Acesso ".esc($usuario->nome),
+            'usuario' => $usuario,
+
+        ];
+
+        // Quando o Usuario for cliente retornamos a View
+        if(in_array(2, array_column($usuario->grupos, 'grupo_id'))){
+
+            
+            return redirect()->to(site_url("usuarios/exibir/$usuario->id"))
+                            ->with('info', "Esse Usuário já faz parte do Grupo Clientes!");
+
+        }
+
+        if(!empty($usuario->grupos)){
+
+            //Recuperamos os Grupos que o usuario não faz parte
+            $gruposExistentes = array_column($usuario->grupos, 'grupo_id');
+
+            $data['gruposDisponiveis'] = $this->grupoModel
+                                              ->where('id !=', 2)
+                                              ->whereNotIn('id', $gruposExistentes)
+                                              ->findAll();
+
+        }else{
+
+            //Recuperamos Todos os Grupos com exceção o ID 2 que é o cliente!
+            $data['gruposDisponiveis'] = $this->grupoModel
+                                              ->where('id !=', 2)
+                                              ->findAll();
+        }
+
+
+        return view('Usuarios/grupos', $data);
+
+    }
+
+    public function salvarGrupos()
+    {
+
+         // Envio hash  Token do Form
+         $retorno['token'] = csrf_hash();
+
+         // Recupero o Post da requisição
+         $post = $this->request->getPost();
+ 
+   
+         //Validando o Usuário
+         $usuario = $this->buscaUsuarioOu404($post['id']);
+
+         if(empty($post['grupo_id'])){
+
+            // Retorno de erro de Validação
+            $retorno['erro'] = 'Verifique os Dados';
+            $retorno['erros_model'] = ['grupo_id' => 'Escolha uma ou mais Grupos!'];
+
+            //Retorno para o Ajax Request
+            return $this->response->setJSON($retorno);
+        }
+
+        if(in_array(2, $post['grupo_id'])){
+
+            // Retorno de erro de Validação
+            $retorno['erro'] = 'Verifique os Dados';
+            $retorno['erros_model'] = ['grupo_id' => 'O Grupo Clientes não pode Ser Atribuido Manualmente!'];
+
+            //Retorno para o Ajax Request
+            return $this->response->setJSON($retorno);
+        }
+
+         //Recebe as Permissões do Post
+         $grupoPush = [];
+
+         foreach($post['grupo_id'] as $grupo){
+             
+             array_push($grupoPush, [
+                 'grupo_id' => $grupo,
+                 'usuario_id' => $usuario->id,
+             ]);
+         }
+
+         $this->grupoUsuarioModel->insertBatch($grupoPush);
+         session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+ 
+         return $this->response->setJSON($retorno);
+    }
 
 
 
