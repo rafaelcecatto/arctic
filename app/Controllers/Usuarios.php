@@ -417,13 +417,19 @@ class Usuarios extends BaseController
         ];
 
         // Quando o Usuario for cliente retornamos a View
-        if(in_array(2, array_column($usuario->grupos, 'grupo_id'))){
-
-            
+        $grupoCliente = 2;
+        if(in_array($grupoCliente, array_column($usuario->grupos, 'grupo_id'))){
             return redirect()->to(site_url("usuarios/exibir/$usuario->id"))
                             ->with('info', "Esse Usuário já faz parte do Grupo Clientes!");
-
         }
+
+        $grupoAdmin = 1;
+        if(in_array($grupoAdmin, array_column($usuario->grupos, 'grupo_id'))){
+            $usuario->full_control = true; // Esta no Grupo admim, Ele já Retorna a view
+            return view('Usuarios/grupos', $data);
+        }
+
+            $usuario->full_control = false; // Não esta no grupo admin, ele segue a seleção
 
         if(!empty($usuario->grupos)){
 
@@ -448,20 +454,22 @@ class Usuarios extends BaseController
 
     }
 
+
+    //Metodo Salva Grupos
     public function salvarGrupos()
     {
 
          // Envio hash  Token do Form
-         $retorno['token'] = csrf_hash();
+        $retorno['token'] = csrf_hash();
 
          // Recupero o Post da requisição
-         $post = $this->request->getPost();
+        $post = $this->request->getPost();
  
    
          //Validando o Usuário
-         $usuario = $this->buscaUsuarioOu404($post['id']);
+        $usuario = $this->buscaUsuarioOu404($post['id']);
 
-         if(empty($post['grupo_id'])){
+        if(empty($post['grupo_id'])){
 
             // Retorno de erro de Validação
             $retorno['erro'] = 'Verifique os Dados';
@@ -481,21 +489,64 @@ class Usuarios extends BaseController
             return $this->response->setJSON($retorno);
         }
 
-         //Recebe as Permissões do Post
-         $grupoPush = [];
+        //Verificar se No Post está vindo um Grupo Admin
+        if(in_array(1, $post['grupo_id'])){
 
-         foreach($post['grupo_id'] as $grupo){
+            $grupoAdmin = [
+                'grupo_id' => 1,
+                'usuario_id' => $usuario->id,
+            ];
+
+            //Associar o Usuario apenas ao grupo Admin
+            $this->grupoUsuarioModel->insert($grupoAdmin);
+            //Remove Todos os Grupos que estavam associados
+            $this->grupoUsuarioModel->where('grupo_id !=', 1)
+                                    ->where('usuario_id', $usuario->id)
+                                    ->delete();
+
+            session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+ 
+            return $this->response->setJSON($retorno);
+        
+        }
+
+         //Recebe as Permissões do Post
+        $grupoPush = [];
+
+        foreach($post['grupo_id'] as $grupo){
              
              array_push($grupoPush, [
                  'grupo_id' => $grupo,
                  'usuario_id' => $usuario->id,
              ]);
-         }
+        }
 
-         $this->grupoUsuarioModel->insertBatch($grupoPush);
-         session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+        $this->grupoUsuarioModel->insertBatch($grupoPush);
+        session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
  
-         return $this->response->setJSON($retorno);
+        return $this->response->setJSON($retorno);
+    }
+
+
+    //Metodo Remove Grupos
+    public function removeGrupo(int $principal_id = null)
+    {
+
+        if($this->request->getMethod() == 'post'){
+
+            $grupoUsuario = $this->buscaGrupoUsuarioOu404($principal_id);
+
+            if($grupoUsuario->grupo_id == 2){
+                return redirect()->to(site_url("usuarios/exibir/$grupoUsuario->usuario_id"))->with("info", "Não é permitido a exclusão do Grupo Clientes!");
+            }
+
+            $this->grupoUsuarioModel->delete($principal_id);
+            return redirect()->back()->with("sucesso", "Grupo Removido com Sucesso!");
+        }
+
+
+        //Não é POST
+        return redirect()->back();
     }
 
 
@@ -510,6 +561,18 @@ class Usuarios extends BaseController
 
         return $usuario;
     }
+
+
+     //Metodo que Busca o Registro de Grupo e Permissões
+     private function buscaGrupoUsuarioOu404(int $principal_id = null)
+     {
+ 
+         if(! $principal_id || !$grupoUsuario = $this->grupoUsuarioModel->find($principal_id)){
+             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound("Não encontramos o Registro de Grupos $principal_id");
+         }
+ 
+         return $grupoUsuario;
+     }
 
 
     //Metodo para Manipular a Imagem

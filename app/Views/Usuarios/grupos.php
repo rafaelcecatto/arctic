@@ -44,7 +44,15 @@
 
             <?php if (empty($gruposDisponiveis)) : ?>
 
-                <p class="contributions mt-0">Esse Usuário já faz parte de todos os Grupos!</p>
+                <?php if($usuario->full_control == false): ?>
+
+                    <p class="contributions mt-0">Esse Usuário já faz parte de todos os Grupos!</p>
+
+                <?php else : ?>
+                    
+                    <p class="contributions mt-0">Esse Usuário já é um Administrador, para associá-lo a outros Grupos, Remova o Administrador!</p>
+
+                <?php endif ?>
 
             <?php else : ?>
 
