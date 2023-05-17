@@ -33,4 +33,49 @@ class Usuario extends Entity
             return '<i class="fa fa-lock text-warning"></i>&nbsp;Inativo';
         }
     }
+
+
+    /**
+     * Metodo que verifica se a senha é válida
+     * 
+     * @param string $password
+     * @return boolean
+     */
+    public function verificaPassword(string $password): bool
+    {
+
+        return password_verify($password, $this->password_hash);
+
+    }
+
+
+    /**
+     * Metodo que Válida se o Usuario logado possui permissão acessar determindas Rotas
+     * 
+     * @param string $permissao
+     * @return boolean
+     */
+    public function temPermissaoPara(string $permissao) : bool
+    {
+
+        //Se Usuario for admin, retorna True
+        if($this->is_admin == true){
+            return true;
+        }
+
+        //Verifica se o usuario tem permissões
+        if(empty($this->permissoes)){
+            return false;
+        }
+
+
+        // Verica as Permissoes que o usuario Tem
+        if(in_array($permissao, $this->permissoes) == false){
+            return false;
+        }
+
+        //Retorna True pois a Permissão é Valida
+        return true;
+
+    }
 }
