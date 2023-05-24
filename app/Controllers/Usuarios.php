@@ -550,6 +550,67 @@ class Usuarios extends BaseController
     }
 
 
+    public function editarSenha()
+    {
+
+        $data = [
+            'titulo' => 'Edite a senha de acesso',
+        ];
+
+        return view('Usuarios/editar_senha', $data);
+
+    }
+
+
+    public function atualizarSenha()
+    {
+
+        if (!$this->request->isAJAX()){ 
+            return redirect()->back();
+        }
+
+        // Envio hash  Token do Form
+        $retorno['token'] = csrf_hash();
+
+        
+        $current_password = $this->request->getPost('current_password');
+
+        $usuario = usuario_logado();
+
+        if($usuario->verificaPassword($current_password) === false){
+
+            $retorno['erro'] = 'A Senha Digitada não é Válida!';
+            $retorno['erros_model'] = ['current_password' => 'Digite a Senha Correta!'];
+            return $this->response->setJSON($retorno);
+        }
+
+        $usuario->fill($this->request->getPost());
+
+        if($usuario->hasChanged() === false){
+
+            $retorno['info'] = 'Não a dados para serem Atualizados!';
+            return $this->response->setJSON($retorno);
+        }
+
+      
+        if($this->usuarioModel->save($usuario)){
+            session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+
+            return $this->response->setJSON($retorno);
+
+        }
+
+        // Retorno de erro de Validação
+        $retorno['erro'] = 'Verifique os Dados';
+        $retorno['erros_model'] = $this->usuarioModel->errors();
+
+        //Retorno para o Ajax Request
+        return $this->response->setJSON($retorno);
+        
+        
+    }
+
+
 
     //Metodo que Busca o Usuário
     private function buscaUsuarioOu404(int $id = null)
