@@ -38,17 +38,14 @@
 
         <div class="form-group">
           <input id="login-username" type="text" name="email" required data-msg="Por Favor informe seu e-mail" class="input-material">
-          <label for="login-username" class="label-material">E-mail</label>
+          <label for="login-username" class="label-material">Digite seu E-mail</label>
         </div>
-        <div class="form-group">
-          <input id="login-password" type="password" name="password" required data-msg="Por favor informe sua senha" class="input-material">
-          <label for="login-password" class="label-material">Senha</label>
-        </div>
-        <input id="btn-login" type="submit" class="btn btn-primary" value="Entrar">
+        
+        <input id="btn-esqueci" type="submit" class="btn btn-primary" value="Recuperar">
         <!-- This should be submit button but I replaced it with <a> for demo purposes-->
         <?php echo form_close(); ?>
 
-        <a href="<?php echo site_url('esqueci'); ?>" class="forgot-pass mt-2">Esqueceu a Senha?</a>
+        <a href="<?php echo site_url('login'); ?>" class="forgot-pass mt-2">Voltar</a>
 
       </div>
     </div>
@@ -71,7 +68,7 @@
       $.ajax({
 
         type: 'POST',
-        url: '<?php echo site_url('login/criar'); ?>',
+        url: '<?php echo site_url('password/processaesqueci'); ?>',
         data: new FormData(this),
         dataType: 'json',
         contentType: false,
@@ -80,20 +77,20 @@
         beforeSend: function() {
 
           $("#response").html('');
-          $("#btn-login").val('Aguarde');
+          $("#btn-esqueci").val('Aguarde');
 
         },
         success: function(response) {
 
-          $("#btn-login").val('Entrar');
-          $("#btn-login").removeAttr("disabled");
+          $("#btn-esqueci").val('Recuperar');
+          $("#btn-esqueci").removeAttr("disabled");
 
           $('[name=csrf_test_name]').val(response.token);
 
           if (!response.erro) {
 
             // Redirecionamento, quando não houver erro
-            window.location.href = "<?php echo site_url(); ?>" + response.redirect;
+            window.location.href = "<?php echo site_url("password/resetenviado"); ?>";
 
           }
 
@@ -114,8 +111,8 @@
         },
         error: function() {
           alert('Não foi Possivel Salvar!');
-          $("#btn-login").val('Entrar');
-          $("#btn-login").removeAttr("disabled");
+          $("#btn-esqueci").val('Recuperar');
+          $("#btn-esqueci").removeAttr("disabled");
         }
       });
     });

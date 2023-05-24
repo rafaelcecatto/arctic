@@ -594,7 +594,7 @@ class Usuarios extends BaseController
 
       
         if($this->usuarioModel->save($usuario)){
-            session()->setFlashdata('sucesso', 'Salvo com Sucesso!');
+            $retorno['sucesso'] = 'Senha Alterada com Sucesso!';
 
             return $this->response->setJSON($retorno);
 
