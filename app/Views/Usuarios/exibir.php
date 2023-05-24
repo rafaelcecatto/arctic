@@ -52,6 +52,7 @@
                      <div class="dropdown-menu">
                         <a class="dropdown-item" href="<?php echo site_url("usuarios/editar/$usuario->id"); ?>">Editar</a>
                         <a class="dropdown-item" href="<?php echo site_url("usuarios/grupos/$usuario->id"); ?>">Grupos de Acesso</a>
+                        <a class="dropdown-item" href="<?php echo site_url("usuarios/editarsenha"); ?>">Editar Senha</a>
                     <div class="dropdown-divider"></div>
                         <?php if($usuario->data_exclusao == null):  ?>
                             <a class="dropdown-item" href="<?php echo site_url("usuarios/excluir/$usuario->id"); ?>">Excluir</a>
