@@ -208,6 +208,7 @@
           <li><a href="#dropdown-menuAdministrativo" aria-expanded="false" data-toggle="collapse"> <i class="icon-windows" ></i>Administrativo </a>
                 <ul id="dropdown-menuAdministrativo" class="collapse list-unstyled ">
                   <li class="<?php echo (url_is('grupos*') ? 'active' : '') ?>"><a href="<?php echo site_url('grupos')?>"><i class="icon-settings"></i>Grupos</a></li>
+                  <li class="<?php echo (url_is('editar_senha*') ? 'active' : '') ?>"><a href="<?php echo site_url("usuarios/editarsenha"); ?>"><i class="icon-settings"></i>Editar Senha</a></li>
                   <li><a href="#">Page</a></li>
                   <li><a href="#">Page</a></li>
                 </ul>
