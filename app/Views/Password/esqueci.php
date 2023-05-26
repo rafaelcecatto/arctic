@@ -32,7 +32,7 @@
 
         <?php echo form_open('/', ['id' => 'form', 'class' => 'form-validate']) ?>
 
-        <div id="response">
+        <div id="response" class="small">
 
         </div>
 

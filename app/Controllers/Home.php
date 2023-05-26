@@ -36,4 +36,29 @@ class Home extends BaseController
         //dd($autenticacao->estaLogado());
 
     }
+
+
+
+    public function email()
+    {
+        
+        $email = service('email');
+
+        $email->setFrom('no-reply@arctic.com', 'Arctic Sistema');
+        $email->setTo('rcecatto@icloud.com');
+       
+        $email->setSubject('Recuperação de Senha');
+        $email->setMessage('Segue o Processo para Recuperar Senha!');
+
+        if($email->send()){
+
+            echo 'E-mail Enviado!';
+
+        }else{
+
+            $email->printDebugger();
+
+        }
+      
+    }
 }
