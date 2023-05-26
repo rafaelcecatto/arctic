@@ -36,11 +36,10 @@
     <div class="container d-flex align-items-center">
       <div class="form-holder has-shadow">
 
+        <?php echo $this->include('Layout/_msgs'); ?>
+
         <!-- Espaço para renderizar o conteúdo de cada View -->
         <?php echo $this->renderSection('conteudo'); ?>
-
-
-        <?php echo $this->include('Layout/_msgs'); ?>
 
 
       </div>
