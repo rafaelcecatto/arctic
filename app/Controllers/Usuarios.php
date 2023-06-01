@@ -612,7 +612,12 @@ class Usuarios extends BaseController
 
 
 
-    //Metodo que Busca o Usuário
+    /**
+     * Método que Recupera o Usuário
+     * 
+     * @param integer $id
+     * @return Exceptions|object
+     */
     private function buscaUsuarioOu404(int $id = null)
     {
 

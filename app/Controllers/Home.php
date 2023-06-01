@@ -4,8 +4,13 @@ namespace App\Controllers;
 
 use App\Libraries\Autenticacao;
 
+use App\Traits\ValidacoesTrait;
+
 class Home extends BaseController
 {
+
+    use ValidacoesTrait;
+
     public function index()
     {
 
@@ -60,5 +65,14 @@ class Home extends BaseController
 
         }
       
+    }
+
+
+    public function cep()
+    {
+        $cep = "18180-000";
+
+        return $this->response->setJSON($this->consultaViaCep($cep));
+
     }
 }

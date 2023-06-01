@@ -4,6 +4,8 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
+use App\Libraries\Token;
+
 class UsuarioModel extends Model
 {
     protected $table            = 'usuarios';
@@ -105,6 +107,40 @@ class UsuarioModel extends Model
                     ->where('usuarios.id', $usuario_id)
                     ->groupBy('permissoes.nome')
                     ->findAll();
+    }
+
+
+    /**
+     * Método que compara o Hash do token do Usuário para Redefinir Senha
+     * 
+     * @param string $token
+     * @return null|object
+     */
+    public function buscaHashUsuario(string $token)
+    {
+
+        //Instancia o Objeto da Clase
+        $token = new Token($token);
+
+        //Recupera o Hash do Token
+        $tokenHash = $token->getHash();
+
+        //Consulta na Base o Usuário de acordo com o Hash
+        $usuario = $this->where('reset_hash', $tokenHash)
+                        ->where('data_exclusao', null)
+                        ->first();
+
+        //Valida se o Usuário foi encontrado
+        if($usuario === null){
+            return null;
+        }
+
+        //Valida se o token é Válido
+        if($usuario->reset_expira < date('Y-m-d H:i:s')){
+            return null;
+        }
+
+        return $usuario;
     }
 
 }

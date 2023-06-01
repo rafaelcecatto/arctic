@@ -194,6 +194,7 @@
                 <li><a href="#dropdown-menuPessoas" aria-expanded="false" data-toggle="collapse"> <i class="icon-windows" ></i>Pessoas </a>
                   <ul id="dropdown-menuPessoas" class="collapse list-unstyled ">
                     <li class="<?php echo (url_is('usuarios*') ? 'active' : '') ?>"><a href="<?php echo site_url('usuarios')?>"><i class="icon-user"></i>Usuários</a></li>
+                    <li class="<?php echo (url_is('fornecedores*') ? 'active' : '') ?>"><a href="<?php echo site_url('fornecedores')?>"><i class="icon-user"></i>Fornecedor</a></li>
                     <li><a href="#">Page</a></li>
                     <li><a href="#">Page</a></li>
                   </ul>
