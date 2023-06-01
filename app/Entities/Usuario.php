@@ -98,4 +98,17 @@ class Usuario extends Entity
 
         $this->reset_expira = date('Y-m-d H:i:s', time() + 7200);
     }
+
+
+    /**
+     * Método que Limpa o Hash e o Expira
+     * 
+     * @return void
+     */
+    public function finalizaPasswordReset() : void
+    {
+
+        $this->reset_hash = null;
+        $this->reset_expira = null;
+    }
 }
