@@ -39,7 +39,7 @@
                         <?php if($fornecedor->data_exclusao == null):  ?>
                             <a class="dropdown-item" href="<?php echo site_url("fornecedores/excluir/$fornecedor->id"); ?>">Excluir</a>
                         <?php else: ?>
-                            <a class="dropdown-item" href="<?php echo site_url("fornecedores/restaurarusuario/$fornecedor->id"); ?>">Recuperar</a>
+                            <a class="dropdown-item" href="<?php echo site_url("fornecedores/restaurarfornecedor/$fornecedor->id"); ?>">Recuperar</a>
                         <?php endif; ?>
                     </div>
                 </div>
