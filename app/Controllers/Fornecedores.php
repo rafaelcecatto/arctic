@@ -11,10 +11,12 @@ class Fornecedores extends BaseController
     use ValidacoesTrait;
 
     private $fornecedorModel;
+    private $NotaFiscalModel;
 
     public function __construct()
     {
         $this->fornecedorModel = new \App\Models\FornecedorModel();
+        $this->NotaFiscalModel = new \App\Models\NotaFiscalModel();
     }
 
 
@@ -132,7 +134,7 @@ class Fornecedores extends BaseController
         $fornecedor = $this->buscaFornecedorOu404($id);
         
         $data = [
-            'titulo' => "Dados do Fornecedor ".esc($fornecedor->nome),
+            'titulo' => "Dados do Fornecedor ".esc($fornecedor->razao),
             'fornecedor' => $fornecedor,
 
         ];
@@ -201,7 +203,7 @@ class Fornecedores extends BaseController
 
 
 
-    public function excluir($id = null)
+    public function excluir(int $id = null)
     {
         $fornecedor = $this->buscaFornecedorOu404($id);
 
@@ -227,7 +229,97 @@ class Fornecedores extends BaseController
     }
 
 
+    //Funcao Restaurar Usuário
+    public function restaurarFornecedor(int $id = null)
+    {
+        //Validando o Usuário
+        $fornecedor = $this->buscaFornecedorOu404($id);
+
+        if($fornecedor->data_exclusao === null){
+
+            return redirect()->back()->with('info', "Fornecedor não está Excluído!");
+        }
+
+        $fornecedor->data_exclusao = null;
+        $this->fornecedorModel->protect(false)->save($fornecedor);
+
+        return redirect()->back()->with('sucesso', "Fornecedor $fornecedor->razao Recuperado com Sucesso!");
+    }
+
+
+    public function notas(int $id = null)
+    {
+        //Validando o Usuário
+        $fornecedor = $this->buscaFornecedorOu404($id);
+
+        $fornecedor->notas_fiscais = $this->NotaFiscalModel->where('fornecedor_id', $fornecedor->id)->paginate(10);
+        
+        
+        if($fornecedor->notas_fiscais != null){
+
+            $fornecedor->pager = $this->NotaFiscalModel->pager;
+        }
+
+
+        $data = [
+            'titulo' => "Notas Fiscais do Fornecedor ".esc($fornecedor->razao),
+            'fornecedor' => $fornecedor,
+
+        ];
+        return view('Fornecedores/notas_fiscais', $data);
+
+    }
+
+
+    public function cadastrarNota()
+    {
+        if (!$this->request->isAJAX()){ 
+            return redirect()->back();
+        }
+
+        $retorno['token'] = csrf_hash();
+
+        $post = $this->request->getPost();
+
+        $valorNota = str_replace([',', '.'], '', $post['valor_nota']);
+
+        if($valorNota < 1){
+
+            $retorno['erro'] = 'Verifique os Campos Abaixo e Tente Novamente!';
+            $retorno['erros_model'] = ['valor_nota' => 'O Valor da Nota deve Ser Maior que Zero!'];
+
+            return $this->response->setJSON($retorno);
+        }
+
+        $validacao = service('validation');
+
+        $regras = [
+            'valor_nota' => 'required',
+            'data_emissao' => 'required',
+            'nota_fiscal' => 'uploaded[nota_fiscal]|max_size[nota_fiscal,1024]|ext_in[nota_fiscal,pdf]',
+            'descricao_itens' => 'required',
+            
+        ];
+
+        $mensagens = [   // Errors
+            'nota_fiscal' => [
+                'uploaded' => 'Nenhuma Nota Selecionada!',
+                'ext_in' => 'Extenção Inválida! Use .PDF!',
+            ],
+        ];
+
+        $validacao->setRules($regras, $mensagens);
+
+        if($validacao->withRequest($this->request)->run() === false){
+
+             $retorno['erro'] = 'Verifique os Dados';
+             $retorno['erros_model'] = $validacao->getErrors();
+
+             return $this->response->setJSON($retorno);
+        }
+    }
     
+
     public function consultaCep()
     {
         if(!$this->request->isAJAX()){

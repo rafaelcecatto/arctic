@@ -18,7 +18,7 @@ class Fornecedor extends Entity
 
             $icone = '<span class="text-white">Excluído</span>&nbsp<i class="fa fa-undo"></i>&nbsp;Desfazer';
 
-            $situacao = anchor("fornecedores/restaurarusuario/$this->id", $icone, ['class' => 'btn btn-outline-succes btn-sm']);
+            $situacao = anchor("fornecedores/restaurarfornecedor/$this->id", $icone, ['class' => 'btn btn-outline-succes btn-sm']);
 
             return $situacao;
         }
